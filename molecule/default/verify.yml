@@ -3,8 +3,19 @@
 
 - name: Verify
   hosts: all
-  gather_facts: false
+  gather_facts: true
+  vars:
+    apt_cache_valid_time: 300
+    gnupg_default_cache_ttl: 3600
+    gnupg_max_cache_ttl: 86400
+    env_files_path: "{{ ansible_user_dir }}/.env-files.d"
   tasks:
-  - name: Example assertion
-    ansible.builtin.assert:
-      that: true
+    - name: Find .gnupg folder
+      ansible.builtin.stat:
+        path: "{{ ansible_user_dir }}/.gnupg"
+      register: gnupg_dir
+
+    - name: Make sure .gnupg folder exists
+      ansible.builtin.assert:
+        that:
+          - gnupg_dir.stat.exists
